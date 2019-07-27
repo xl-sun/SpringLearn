@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 静态工厂 -->
+    <bean id="serviceStatic" class="my.sxl.c_inject.StaticFactory" factory-method="getService">
+      <!--  <property name="dao" ref="dao"></property>-->
+    </bean>
+
+    <!-- 实例工厂 -->
+    <bean id="serviceInstance" factory-bean="InstanceFactory" factory-method="getService" ></bean>
+    <bean id="InstanceFactory" class="my.sxl.c_inject.InstanceFactory"></bean>
+
+<!--    <bean id="dao" class="my.sxl.c_inject.DAOImpl">-->
+<!--        <property name="string" value="c_inject.xml"></property>-->
+<!--    </bean>-->
+</beans>
