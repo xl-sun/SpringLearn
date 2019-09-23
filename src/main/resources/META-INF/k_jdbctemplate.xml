@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                            http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="my.sxl.k_jdbctemplate.dao"></context:component-scan>
+    <context:property-placeholder location="classpath:properties/db.properties"></context:property-placeholder>
+
+    <!-- 创建数据源 - dbcp -->
+    <bean id="dateSourceDBCP" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${mysql.driver}"></property>
+        <property name="url" value="${mysql.url}"></property>
+        <property name="username" value="${mysql.user}"></property>
+        <property name="password" value="${mysql.password}"></property>
+    </bean>
+
+    <!-- 创建数据源 - c3p0 -->
+    <bean id="dateSourceC3P0" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${mysql.driver}"></property>
+        <property name="jdbcUrl" value="${mysql.url}"></property>
+        <property name="user" value="${mysql.user}"></property>
+        <property name="password" value="${mysql.password}"></property>
+    </bean>
+
+    <bean id="jdbcTemplateDBCP" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dateSourceDBCP"></property>
+    </bean>
+
+    <!--
+    <bean id="jdbcTemplateC3P0" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dateSourceC3P0"></property>
+    </bean>
+     -->
+
+    <bean id="accountBalanceDAO" class="my.sxl.k_jdbctemplate.dao.impl.AccountBalanceDAOImpl">
+        <property name="dataSource" ref="dateSourceC3P0"></property>
+    </bean>
+
+
+
+</beans>

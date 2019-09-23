@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                            http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:properties/db.properties"></context:property-placeholder>
+
+    <!-- 创建数据源 - dbcp -->
+    <bean id="dateSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${mysql.driver}"></property>
+        <property name="url" value="${mysql.url}"></property>
+        <property name="username" value="${mysql.user}"></property>
+        <property name="password" value="${mysql.password}"></property>
+    </bean>
+
+    <!-- dao -->
+    <bean id="accountBalanceDAO" class="my.sxl.k_jdbctemplate.dao.impl.AccountBalanceDAOImpl">
+        <property name="dataSource" ref="dateSource"></property>
+    </bean>
+
+    <!-- service -->
+    <bean id="accountService" class="my.sxl.l_transaction.proxy.serviceImpl.AccountServiceImpl">
+        <property name="accountBalanceDAO" ref="accountBalanceDAO"></property>
+    </bean>
+
+    <!-- 配置proxy service对象 -->
+    <bean id="proxyAccountService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="proxyInterfaces" value="my.sxl.l_transaction.service.AccountService"></property>
+        <property name="target" ref="accountService"></property>
+        <property name="transactionManager" ref="txManager"></property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="transferById">PROPAGATION_REQUIRED,ISOLATION_DEFAULT</prop>
+                <prop key="transfer">PROPAGATION_REQUIRED,ISOLATION_DEFAULT</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- 配置事务管理器 -->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dateSource"></property>
+    </bean>
+
+
+</beans>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:txBulabula="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                            http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/aop
+                            http://www.springframework.org/schema/aop/spring-aop.xsd
+                           http://www.springframework.org/schema/tx
+                            http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <context:property-placeholder location="classpath:properties/db.properties"></context:property-placeholder>
+
+    <!-- 创建数据源 - dbcp -->
+    <bean id="dateSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${mysql.driver}"></property>
+        <property name="url" value="${mysql.url}"></property>
+        <property name="username" value="${mysql.user}"></property>
+        <property name="password" value="${mysql.password}"></property>
+    </bean>
+
+    <!-- dao -->
+    <bean id="accountBalanceDAO" class="my.sxl.k_jdbctemplate.dao.impl.AccountBalanceDAOImpl">
+        <property name="dataSource" ref="dateSource"></property>
+    </bean>
+
+    <!-- service -->
+    <bean id="accountService" class="my.sxl.l_transaction.aop.serviceImpl.AccountServiceImpl">
+        <property name="accountBalanceDAO" ref="accountBalanceDAO"></property>
+    </bean>
+
+    <!-- 配置事务管理器 -->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dateSource"></property>
+    </bean>
+
+    <!-- 配置AOP -->
+    <aop:config>
+                <!--<aop:advisor advice-ref="txAdvice" pointcut="execution(* my.sxl.l_transaction.aop.serviceImpl..*ServiceImpl.*(..))"></aop:advisor>-->
+                <aop:advisor advice-ref="txAdvice" pointcut="execution(* my.sxl.l_transaction.*..*ServiceImpl.transfer*(..))"></aop:advisor>
+    </aop:config>
+
+    <!--<aop:aspectj-autoproxy expose-proxy="true"></aop:aspectj-autoproxy>-->
+
+    <!-- 配置事务详情 -->
+    <txBulabula:advice id="txAdvice" transaction-manager="txManager">
+        <txBulabula:attributes>
+            <txBulabula:method name="transferById" isolation="DEFAULT" propagation="REQUIRED"/>
+            <txBulabula:method name="transfer" isolation="DEFAULT" propagation="REQUIRED"/> <!-- 这个还是有点懵 -->
+        </txBulabula:attributes>
+    </txBulabula:advice>
+
+</beans>

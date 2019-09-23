@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="employee"  class="my.sxl.f_spel.Employee" init-method="init" destroy-method="destroy">
+        <!--判断id、name有否默认值，没有的话赋值-->
+        <property name="id" value="#{employee.id eq null ?job.jobTitle:employee.id}"></property>
+        <property name="name" value="#{employee.name eq null ?'新的name:'+job.jobTitle:employee.name}"></property>
+        <!--以子标记形式配置value-->
+        <property name="tel">
+            <value>13098765432</value>
+        </property>
+        <property name="job">
+            <ref bean="job"></ref>
+        </property>
+    </bean>
+    <bean id="job" class="my.sxl.f_spel.Job" init-method="init" destroy-method="destroy">
+        <property name="id" value="8"></property>
+        <property name="jobTitle" value="#{T(my.sxl.f_spel.Job).JOBS[job.id]}"></property>
+    </bean>
+</beans>

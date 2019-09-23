@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                            http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="my.sxl.h_proxy"></context:component-scan>
+
+    <!--
+    <bean id="aopServiceID" class="my.sxl.h_proxy.aop.impl.AOPServiceImpl"></bean>
+    <bean id="aopAspectID" class="my.sxl.h_proxy.aop.AOPAspect"></bean>
+    -->
+    <bean id="proxyService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="interfaces" value="my.sxl.h_proxy.aop.AOPService"></property>
+        <property name="target" ref="aopService"></property>
+        <property name="interceptorNames" value="aopAspect"></property>
+    </bean>
+</beans>
